@@ -118,6 +118,16 @@
             <PaintGroupHighlightMap />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/validation/is-empty.js">
+          <value>
+            <PaintGroupHighlightMap />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/validation/register.js">
+          <value>
+            <PaintGroupHighlightMap />
+          </value>
+        </entry>
       </map>
     </option>
   </component>
