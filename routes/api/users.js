@@ -7,7 +7,7 @@ const passport = require('passport');
 
 // Load Input Validation
 const validateRegisterInput = require('../.././validation/register');
-
+const validateLoginInput = require('../.././validation/login');
 //Bring in the user model
 const User = require('../../models/User.js');
 
@@ -25,7 +25,8 @@ router.post('/register', (req , res)=>{
     User.findOne({ email: req.body.email})
         .then(user =>{
             if(user){
-                return res.status(400).json({email: 'Email already exists!'})
+                errors.email = 'Email already exists!';
+                return res.status(400).json({email: errors})
         }
         else{
             // make a new instance inside UserSchema && fill it with the values from the form
@@ -63,10 +64,17 @@ router.post('/login', (req,res)=>{
     const email = req.body.email;
     const password = req.body.password;
 
+    //  VALIDATION
+    const {errors, isValid} = validateLoginInput(req.body);
+    //check validation
+    if(!isValid){
+        return res.status(400).json(errors)
+    }
     User.findOne({email: email}).then(user =>{
         //value is the email const defined in this route
         if(!user){
-            return res.status(404).json({email: 'User not found.'})
+            errors.email = 'User not found.';
+            return res.status(404).json({email: email})
         }
         if(user){
             //password is also the const defined in this route and user.password is the hashed pw in db.
@@ -84,11 +92,10 @@ router.post('/login', (req,res)=>{
                         //pass in the payload to generate a token, the key, when the key expires, and a callback that returns an error or the token upon successful login.
                         //if successful, the token gets sent back as the response
                         (err, token)=>{res.json({success: true, token: 'Bearer ' + token})} //weill need enter the token into the header
-
                         );
-
                 }else{
-                    return res.status(404).json({password: "Password is incorrect"})
+                    errors.password = "Password is incorrect";
+                    return res.status(404).json({password: password})
                 }
             })
         }
@@ -107,5 +114,4 @@ router.get('/current', passport.authenticate('jwt', {session: false}),
     //arg1: route handle
     //arg2 : pass in passport.authenticate() <== this method takes the token, session param
     //arg3: cb
-
 module.exports = router;
