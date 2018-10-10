@@ -8,6 +8,7 @@ const User = require('../../models/User.js');
 
 router.get('/test' , (req,res)=> res.json({msg: 'users route works'}));
 
+// REGISTRATION
 router.post('/register', (req , res)=>{
     User.findOne({ email: req.body.email})
         .then(user =>{
@@ -41,6 +42,32 @@ router.post('/register', (req , res)=>{
                     }
                 })
             });
+        }
+    })
+});
+
+
+// LOGIN / RETURNS THE TOKEN
+
+router.post('/login', (req,res)=>{
+    const email = req.body.email;
+    const password = req.body.password;
+
+    User.findOne({email: email}).then(user =>{
+        //value is the email const defined in this route
+        if(!user){
+            return res.status(404).json({email: 'User not found.'})
+        }
+        if(user){
+            //password is also the const defined in this route and user.password is the hashed pw in db.
+            bcrypt.compare(password, user.password).then(isMatch =>{
+                if(isMatch){
+                    //if there's a match, generate the token to send back.
+                    res.json({msg: 'success'})
+                }else{
+                    return res.status(404).json({password: "Password is incorrect"})
+                }
+            })
         }
     })
 });
