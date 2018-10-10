@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys');
+const passport = require('passport');
 
 
 //Bring in the user model
@@ -46,9 +49,7 @@ router.post('/register', (req , res)=>{
     })
 });
 
-
 // LOGIN / RETURNS THE TOKEN
-
 router.post('/login', (req,res)=>{
     const email = req.body.email;
     const password = req.body.password;
@@ -62,8 +63,21 @@ router.post('/login', (req,res)=>{
             //password is also the const defined in this route and user.password is the hashed pw in db.
             bcrypt.compare(password, user.password).then(isMatch =>{
                 if(isMatch){
-                    //if there's a match, generate the token to send back.
-                    res.json({msg: 'success'})
+                    //if there's a match, generate the token to send back: SIGN IN THE USER
+                    //.sign() takes in a payload, payload is what we want to include in the token : in the payload, will be some of the user's info and a secret/key
+                    const payload = {
+                        //don't include private stuff
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                    };
+                    jwt.sign(payload, keys.secretOrKey, {expiresIn: 3600},
+                        //pass in the payload to generate a token, the key, when the key expires, and a callback that returns an error or the token upon successful login.
+                        //if successful, the token gets sent back as the response
+                        (err, token)=>{res.json({success: true, token: 'Bearer ' + token})} //weill need enter the token into the header
+
+                        );
+
                 }else{
                     return res.status(404).json({password: "Password is incorrect"})
                 }
@@ -71,5 +85,18 @@ router.post('/login', (req,res)=>{
         }
     })
 });
+
+//Current user after they pass login and receive the token (PRIVATE ROUTE)
+router.get('/current', passport.authenticate('jwt', {session: false}),
+    (req,res)=> {
+        res.json({
+            id: req.user.id,
+            name: req.user.name,
+            email: req.user.email
+        });
+    });
+    //arg1: route handle
+    //arg2 : pass in passport.authenticate() <== this method takes the token, session param
+    //arg3: cb
 
 module.exports = router;
