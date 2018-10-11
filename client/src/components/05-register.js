@@ -1,4 +1,8 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {registerUser} from "../actions/auth-actions";
+import PropTypes from 'prop-types'
+
 class Register extends Component{
     constructor(props){
         super(props);
@@ -28,30 +32,46 @@ class Register extends Component{
         };
 
         console.log(newUser);
+        this.props.registerUser(newUser)
 
     };
 
    render(){
         // console.log( this.state);
+       const {errors} = this.state;
+       const { user } = this.props.auth; //*NOTE remember that { user  } came from the empty obj initially set up in the auth reducer
+
+
        return(
            <section className='register-main'>
-               <div className='container bg-light'>
+               <div className='container form-container bg-light'>
                    <h1>REGISTER</h1>
 
-                   <input name='name'  value={this.state.name}  onChange={this.onChange} className='d-block' placeholder='name: '/>
-                   <input name='email' value={this.state.email} onChange={this.onChange} className='d-block' placeholder='email: : '/>
-                   <input name='password'  value={this.state.password} onChange={this.onChange} className='d-block' placeholder='password: '/>
-                   <input name="password2"  value={this.state.password2} onChange={this.onChange} className='d-block' placeholder='confirm password: '/>
+                   <input name='name'  value={this.state.name}  onChange={this.onChange} className='form-input' placeholder='name: '/>
+                   <input name='email' value={this.state.email} onChange={this.onChange} className='form-input' placeholder='email: : '/>
+                   <input name='password'  value={this.state.password} onChange={this.onChange} className='form-input' placeholder='password: '/>
+                   <input name="password2"  value={this.state.password2} onChange={this.onChange} className='form-input' placeholder='confirm password: '/>
 
-                   <div className='submit-button-cont m-4'>
-                       <div className='btn bg-info' onClick={this.onSubmit}>Submit</div>
+                   <div className='button-wrapper'>
+                       <div className='btn bg-info button' onClick={this.onSubmit}>Submit</div>
                    </div>
-                   <div className='spacer mb-5'></div>
+                   <div className='spacer mb-5'>
+                       <div className='bg-light'>{user ? user.name : null }</div>
+                   </div>
 
                </div>
            </section>
        )
    }
 }
+Register.propTypes = {
+    auth: PropTypes.object.isRequired,
+    registerUser: PropTypes.func.isRequired
+};
 
-export default Register
+
+const mapStateToProps = (state)=>({
+    auth: state.auth
+});
+
+export default connect(mapStateToProps, {registerUser})(Register)

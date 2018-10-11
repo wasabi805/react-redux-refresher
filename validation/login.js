@@ -9,7 +9,7 @@ module.exports = function validateLoginInput(data) {
     data.email = !isEmpty(data.email) ? data.email : '';
     data.password = !isEmpty(data.password) ? data.password : '';
 
-    // =====    ARE THE IInput Fields In the CORRECT FORMAT?    =====
+    // =====    ARE THE Input Fields In the CORRECT FORMAT?    =====
     //  .isLength() ==> arg1 = data = form obj containing user's input from form | arg2 = requirements from from input
 
     if (!Validator.isEmail(data.email)) {
