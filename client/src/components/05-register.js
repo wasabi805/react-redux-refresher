@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {registerUser} from "../actions/auth-actions";
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
+
 
 class Register extends Component{
     constructor(props){
@@ -17,6 +19,19 @@ class Register extends Component{
             this.onSubmit = this.onSubmit.bind(this);
 
     }
+
+    //THIS IS THE MOST IMPORTANT  METHOD IN REGARDS TO enabling
+    //this react component to fire off actions with redux in order to display the errors created in the back end:
+    //For more info, check out this chart from react's official docs
+    // http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
+    componentDidUpdate(prevProps){
+        if(this.props.errors !==prevProps.errors){
+            this.setState({
+                errors : this.props.errors
+            })
+        }
+    };
+
     onChange(event){
         this.setState({ [event.target.name]: event.target.value })
     };
@@ -30,16 +45,15 @@ class Register extends Component{
             password: this.state.password,
             password2: this.state.password2
         };
-
-        console.log(newUser);
         this.props.registerUser(newUser)
 
     };
 
    render(){
-        // console.log( this.state);
+        // console.log( this.state, 'this.state');
+        // console.log(this.props, 'this.props for register comp');
        const {errors} = this.state;
-       const { user } = this.props.auth; //*NOTE remember that { user  } came from the empty obj initially set up in the auth reducer
+        console.log(errors);
 
 
        return(
@@ -47,16 +61,22 @@ class Register extends Component{
                <div className='container form-container bg-light'>
                    <h1>REGISTER</h1>
 
-                   <input name='name'  value={this.state.name}  onChange={this.onChange} className='form-input' placeholder='name: '/>
-                   <input name='email' value={this.state.email} onChange={this.onChange} className='form-input' placeholder='email: : '/>
-                   <input name='password'  value={this.state.password} onChange={this.onChange} className='form-input' placeholder='password: '/>
-                   <input name="password2"  value={this.state.password2} onChange={this.onChange} className='form-input' placeholder='confirm password: '/>
+                   <input type='text' name='name'  value={this.state.name}  onChange={this.onChange} className={classnames('form-input form-control' , {'is-invalid' : errors.name} )} placeholder='name: '/>
+                   {errors.name && (<small className='invalid-feedback'>{errors.name}</small>)}
+
+                   <input type='text' name='email' value={this.state.email} onChange={this.onChange} className={classnames('form-input form-control' , {'is-invalid' : errors.email} )}  placeholder='email: : '/>
+                   {errors.email && (<small className='invalid-feedback'>{errors.email}</small>)}
+
+                   <input type='text' name='password'  value={this.state.password} onChange={this.onChange} className={classnames('form-input form-control' , {'is-invalid' : errors.password} )}  placeholder='password: '/>
+                   {errors.password && (<small className='invalid-feedback'>{errors.password}</small>)}
+
+                   <input type='text' name="password2"  value={this.state.password2} onChange={this.onChange} className={classnames('form-input form-control' , {'is-invalid' : errors.password2} )}  placeholder='confirm password: '/>
+                   {errors.password2 && (<small className='invalid-feedback'>{errors.password2}</small>)}
 
                    <div className='button-wrapper'>
                        <div className='btn bg-info button' onClick={this.onSubmit}>Submit</div>
                    </div>
                    <div className='spacer mb-5'>
-                       <div className='bg-light'>{user ? user.name : null }</div>
                    </div>
 
                </div>
@@ -66,12 +86,14 @@ class Register extends Component{
 }
 Register.propTypes = {
     auth: PropTypes.object.isRequired,
-    registerUser: PropTypes.func.isRequired
+    registerUser: PropTypes.func.isRequired,
+    errors: PropTypes.func.isRequired,
 };
 
 
 const mapStateToProps = (state)=>({
-    auth: state.auth
+    auth: state.auth,
+    errors: state.errors,
 });
 
 export default connect(mapStateToProps, {registerUser})(Register)

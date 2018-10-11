@@ -98,6 +98,11 @@
             <PaintGroupHighlightMap />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/client/src/reducers/errors-reducer.js">
+          <value>
+            <PaintGroupHighlightMap />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/client/src/reducers/index.js">
           <value>
             <PaintGroupHighlightMap />
