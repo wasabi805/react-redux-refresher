@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {registerUser} from "../actions/auth-actions";
 import PropTypes from 'prop-types'
+import {withRouter} from 'react-router-dom'
 import classnames from 'classnames'
 
 
@@ -45,8 +46,8 @@ class Register extends Component{
             password: this.state.password,
             password2: this.state.password2
         };
-        this.props.registerUser(newUser)
-
+        this.props.registerUser(newUser, this.props.history)
+        //this allows us to redirect from within the onSubmit action
     };
 
    render(){
@@ -65,7 +66,7 @@ class Register extends Component{
                    {errors.name && (<small className='invalid-feedback'>{errors.name}</small>)}
 
                    <input type='text' name='email' value={this.state.email} onChange={this.onChange} className={classnames('form-input form-control' , {'is-invalid' : errors.email} )}  placeholder='email: : '/>
-                   {errors.email && (<small className='invalid-feedback'>{errors.email}</small>)}
+                   {errors.email && (<small className='invalid-feedback'>{[errors.email]}</small>)}
 
                    <input type='text' name='password'  value={this.state.password} onChange={this.onChange} className={classnames('form-input form-control' , {'is-invalid' : errors.password} )}  placeholder='password: '/>
                    {errors.password && (<small className='invalid-feedback'>{errors.password}</small>)}
@@ -96,4 +97,4 @@ const mapStateToProps = (state)=>({
     errors: state.errors,
 });
 
-export default connect(mapStateToProps, {registerUser})(Register)
+export default connect(mapStateToProps, {registerUser}) (withRouter(Register))
